@@ -244,34 +244,44 @@ const HomeScreen = () => {
           List of the Turf Poster
         </Text>
 
-        <View>
-          <FlatList
-            data={filterTurfUser}
-            renderItem={renderUser}
-            keyExtractor={item => item._id.toString()}
-            contentContainerStyle={{paddingBottom: 20}}
-            horizontal={true}
-          />
-        </View>
+        {loadingForUser ? (
+          <Text className="text-center">Loading...</Text>
+        ) : turfList.turf.length > 0 ? (
+          <View>
+            <FlatList
+              data={filterTurfUser}
+              renderItem={renderUser}
+              keyExtractor={item => item._id.toString()}
+              contentContainerStyle={{paddingBottom: 20}}
+              horizontal={true}
+            />
+          </View>
+        ) : (
+          <Text className="text-center">No turf poster available</Text>
+        )}
 
         <View className="border-[0.5px] border-gray-500 w-[70%] self-center"></View>
       </View>
 
       {/* list of all users */}
       <View className="mx-3 mt-5">
-        <Text className="text-base font-medium mx-2">
-          List of the User
-        </Text>
+        <Text className="text-base font-medium mx-2">List of the User</Text>
 
-        <View>
-          <FlatList
-            data={filterUser}
-            renderItem={renderUser}
-            keyExtractor={item => item._id.toString()}
-            contentContainerStyle={{paddingBottom: 20}}
-            horizontal={true}
-          />
-        </View>
+        {loadingForUser ? (
+          <Text className="text-center">Loading...</Text>
+        ) : turfList.turf.length > 0 ? (
+          <View>
+            <FlatList
+              data={filterUser}
+              renderItem={renderUser}
+              keyExtractor={item => item._id.toString()}
+              contentContainerStyle={{paddingBottom: 20}}
+              horizontal={true}
+            />
+          </View>
+        ) : (
+          <Text className="text-center">No user available</Text>
+        )}
 
         <View className="border-[0.5px] border-gray-500 w-[70%] self-center"></View>
       </View>
