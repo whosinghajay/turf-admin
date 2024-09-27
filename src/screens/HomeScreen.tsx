@@ -9,7 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
-import {Turf} from '../types/types';
+import {Turf, User} from '../types/types';
 import {API_SERVER} from '../../envVar';
 import LinearGradient from 'react-native-linear-gradient';
 import {default as DeleteIcon} from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -23,19 +23,27 @@ interface TurfInfo {
   turf: Turf[];
 }
 
+interface userInfo {
+  success: boolean;
+  total: number;
+  user: User[];
+}
+
 const HomeScreen = () => {
   const [turfList, setTurfList] = useState<TurfInfo>({
     success: false,
     total: 0,
     turf: [],
   });
-  if (turfList.turf.length > 0) {
-    console.log(turfList.turf[0].turfName);
-  } else {
-    console.log('turfList is empty');
-  }
+
+  const [userList, setUserList] = useState<userInfo>({
+    success: false,
+    total: 0,
+    user: [],
+  });
 
   const [loading, setLoading] = useState<boolean>(true);
+  const [loadingForUser, setLoadingForUser] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,11 +57,29 @@ const HomeScreen = () => {
       } catch (error) {
         console.log((error as Error).message);
       } finally {
-        setLoading(false); // Set loading to false after fetching
+        setLoading(false);
       }
     };
 
     fetchData();
+  }, []);
+
+  useEffect(() => {
+    const fetchAsync = async () => {
+      try {
+        const response = await fetch(`${API_SERVER}/api/v1/user/all`);
+        if (!response.ok) throw new Error('Network response was not ok');
+
+        const result = await response.json();
+        setUserList(result);
+      } catch (error) {
+        console.log((error as Error).message);
+      } finally {
+        setLoadingForUser(false);
+      }
+    };
+
+    fetchAsync();
   }, []);
 
   const renderItem = ({item}: {item: Turf}) => {
@@ -125,6 +151,40 @@ const HomeScreen = () => {
     );
   };
 
+  const renderUser = ({item}: {item: User}) => {
+    // const book = bookingData?.bookings.find(c => c.userId === item._id);
+
+    return (
+      <View className="bg-white rounded-lg shadow-lg p-4 mt-3 mx-3">
+        <View className="flex-row justify-between">
+          <View className="">
+            <Text className="text-gray-600 font-semibold mb-2">User</Text>
+            <Text className="text-gray-600 font-semibold mb-2">Phone no.</Text>
+            {/* <Text className="text-gray-600 font-semibold mb-2">Turf</Text>
+            <Text className="text-gray-600 font-semibold">Slot</Text> */}
+          </View>
+          <View className="ml-4">
+            <Text className="text-black font-bold mb-2">{item.fullName}</Text>
+            <Text className="text-black font-bold mb-2">
+              {item.phoneNumber}
+            </Text>
+            {/* <Text className="text-black font-bold mb-2">
+              {book?.turfInfo.turfName}
+            </Text>
+            <Text className="text-black font-bold">
+              {book?.turfInfo.slot.map(c => c.date)[0]} /{' '}
+              {book?.turfInfo.slot.map(c => c.time).join(', ')}
+            </Text> */}
+          </View>
+        </View>
+      </View>
+    );
+  };
+
+  const filterTurfUser =
+    userList && userList.user.filter(e => e.role === 'turfPoster');
+  const filterUser = userList && userList.user.filter(e => e.role === 'user');
+
   return (
     <ScrollView>
       {/* header */}
@@ -174,6 +234,44 @@ const HomeScreen = () => {
         ) : (
           <Text className="text-center">No turfs available</Text>
         )}
+
+        <View className="border-[0.5px] border-gray-500 w-[70%] self-center"></View>
+      </View>
+
+      {/* list of all turf posters */}
+      <View className="mx-3 mt-5">
+        <Text className="text-base font-medium mx-2">
+          List of the Turf Poster
+        </Text>
+
+        <View>
+          <FlatList
+            data={filterTurfUser}
+            renderItem={renderUser}
+            keyExtractor={item => item._id.toString()}
+            contentContainerStyle={{paddingBottom: 20}}
+            horizontal={true}
+          />
+        </View>
+
+        <View className="border-[0.5px] border-gray-500 w-[70%] self-center"></View>
+      </View>
+
+      {/* list of all users */}
+      <View className="mx-3 mt-5">
+        <Text className="text-base font-medium mx-2">
+          List of the User
+        </Text>
+
+        <View>
+          <FlatList
+            data={filterUser}
+            renderItem={renderUser}
+            keyExtractor={item => item._id.toString()}
+            contentContainerStyle={{paddingBottom: 20}}
+            horizontal={true}
+          />
+        </View>
 
         <View className="border-[0.5px] border-gray-500 w-[70%] self-center"></View>
       </View>
