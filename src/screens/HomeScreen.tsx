@@ -197,7 +197,7 @@ const HomeScreen = () => {
           />
           <View>
             <Text className="text-white text-xl mt-3 ml-4 font-semibold">
-              Hey🖐Admin.
+              Hey🖐, Admin
             </Text>
 
             <Text className="text-white text-sm mt-1 ml-4">
